@@ -58,7 +58,7 @@ POPD
 ECHO. & ECHO Updating ISO...
 CALL :MAKEISO %ISO%
 DEL "%ProgramData%\MakeIso.ps1" /f /q>nul
-ECHO. Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
+ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
 RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
 ECHO. & ECHO Complete!
 PAUSE
