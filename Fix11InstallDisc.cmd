@@ -41,7 +41,7 @@ reg load HKEY_USERS\tmp_DEFAULT %mountdir%\Users\Default\ntuser.dat>>"%~dp0WimFi
 reg add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 reg ADD HKEY_USERS\tmp_DEFAULT\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /t REG_SZ /d "" /f>>"%~dp0WimFix.log"
 reg ADD HKEY_USERS\tmp_DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+reg ADD HKLM\tmp_software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
 reg ADD HKEY_USERS\tmp_DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 reg ADD HKEY_USERS\tmp_DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v HideFileExt /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
 reg unload HKLM\tmp_software>>"%~dp0WimFix.log"
@@ -58,7 +58,7 @@ POPD
 ECHO. & ECHO Updating ISO...
 CALL :MAKEISO %ISO%
 DEL "%ProgramData%\MakeIso.ps1" /f /q>nul
-ECHO. Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
+ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
 RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
 ECHO. & ECHO Complete!
 PAUSE
