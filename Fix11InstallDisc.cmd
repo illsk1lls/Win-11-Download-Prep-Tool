@@ -216,8 +216,8 @@ ECHO. & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"
 7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & POPD
 ECHO. & ECHO Starting ISO Download...
-"%TempDL%\aria2c.exe" --summary-interval=0 --max-connection-per-server=5 https://archive.org/download/win-11-22-h-2-english-x-64v-2_202306/Win11_22H2_English_x64v2.iso -o Win11x64-EN-22H2v2.iso
-MOVE /Y "Win11x64-EN-22H2v2.iso" "%~dp0">nul
-SET ISO="%~dp0Win11x64-EN-22H2v2.iso"
+"%TempDL%\aria2c.exe" --summary-interval=0 --max-tries=0 --max-connection-per-server=5 https://archive.org/download/win-11-22-h-2-english-x-64v-2_202306/Win11_22H2_English_x64v2.iso -o Win11_22H2_English_x64v2.iso
+MOVE /Y "Win11_22H2_English_x64v2.iso" "%~dp0">nul
+SET ISO="%~dp0Win11_22H2_English_x64v2.iso"
 POPD
 EXIT /b
