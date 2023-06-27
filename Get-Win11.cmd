@@ -64,7 +64,7 @@ REG add HKLM\tmp_system\Setup\MoSetup /v AllowUpgradesWithUnsupportedTPMOrCPU /t
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-REG add HKU\tmp_default\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /t REG_SZ /f>>"%~dp0WimFix.log"
+REG add HKU\tmp_default\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /f>>"%~dp0WimFix.log"
 REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v HideFileExt /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
