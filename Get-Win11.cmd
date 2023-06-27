@@ -1,12 +1,12 @@
 @ECHO OFF
 TITLE Windows 11 - Download and System Prep Tool
->nul 2>&1 reg add hkcu\software\classes\.Admin\shell\runas\command /f /ve /d "cmd /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
->nul 2>&1 fltmc|| IF "%f0%" neq "%~f0" (CD.>"%ProgramData%\runas.Admin" & START "%~n0" /high "%ProgramData%\runas.Admin" "%~f0" "%_:"=""%" & EXIT /b)
->nul 2>&1 reg delete hkcu\software\classes\.Admin\ /f
+>nul 2>&1 REG add HKCU\Software\classes\.Admin\shell\runas\command /f /ve /d "cmd /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
+>nul 2>&1 FLTMC|| IF "%f0%" neq "%~f0" (CD.>"%ProgramData%\runas.Admin" & START "%~n0" /high "%ProgramData%\runas.Admin" "%~f0" "%_:"=""%" & EXIT /b)
+>nul 2>&1 REG delete HKCU\Software\classes\.Admin\ /f
 >nul 2>&1 DEL "%ProgramData%\runas.Admin" /f /q
 SET ISO=%1
 SET currentindex=1
-SET "rootfolder=%ProgramData%\FixWindowsDisc"
+SET "rootfolder=%ProgramData%\TempSysPrep"
 SET "folder=%rootfolder%\sources"
 SET "TempDL=%ProgramData%\TempDL"
 ECHO. & ECHO Getting Ready, please wait ...
@@ -54,23 +54,23 @@ ECHO.
 "%TempDL%\wimlib-imagex.exe" extract install.wim %currentindex% /Users/Default/ntuser.dat --dest-dir="%reversepath%/%currentindex%"
 ECHO.
 ECHO Updating Registry of Index %currentindex%...
-reg load HKLM\tmp_software "%reversepath%/%currentindex%\software">>"%~dp0WimFix.log"
-reg load HKLM\tmp_system "%reversepath%/%currentindex%\system">>"%~dp0WimFix.log"
-reg load HKU\tmp_default "%reversepath%/%currentindex%\ntuser.dat">>"%~dp0WimFix.log"
-reg add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_system\ControlSet001\Control\CI\Policy /v SkuPolicyRequired /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_system\Setup\MoSetup /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_system\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_system\Setup\LabConfig /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKLM\tmp_system\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKU\tmp_default\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /t REG_SZ /f>>"%~dp0WimFix.log"
-reg add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-reg add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v HideFileExt /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
-reg unload HKLM\tmp_software>>"%~dp0WimFix.log"
-reg unload HKLM\tmp_system>>"%~dp0WimFix.log"
-reg unload HKU\tmp_default>>"%~dp0WimFix.log"
+REG load HKLM\tmp_software "%reversepath%/%currentindex%\software">>"%~dp0WimFix.log"
+REG load HKLM\tmp_system "%reversepath%/%currentindex%\system">>"%~dp0WimFix.log"
+REG load HKU\tmp_default "%reversepath%/%currentindex%\ntuser.dat">>"%~dp0WimFix.log"
+REG add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_system\ControlSet001\Control\CI\Policy /v SkuPolicyRequired /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_system\Setup\MoSetup /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_system\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_system\Setup\LabConfig /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_system\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKU\tmp_default\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /t REG_SZ /f>>"%~dp0WimFix.log"
+REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add HKU\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v HideFileExt /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+REG unload HKLM\tmp_software>>"%~dp0WimFix.log"
+REG unload HKLM\tmp_system>>"%~dp0WimFix.log"
+REG unload HKU\tmp_default>>"%~dp0WimFix.log"
 ECHO.
 "%TempDL%\wimlib-imagex.exe" update install.wim %currentindex% --command="add "%reversepath%/%currentindex%/SOFTWARE" Windows/System32/config/SOFTWARE"
 ECHO.
