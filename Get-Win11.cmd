@@ -124,18 +124,33 @@ POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7
 7zr.exe e -y 7zExtra.7z>nul & 7za.exe e -y wimlib.zip libwim-15.dll -r -o..>nul & 7za.exe e -y wimlib.zip wimlib-imagex.exe -r -o..>nul
 EXIT /b
 :DOWNLOADISO
+SETLOCAL ENABLEDELAYEDEXPANSION
 CALL :DOWNLOADTOOLS
 TITLE Getting Windows 11
 CLS
 ECHO. & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
 7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE Fido.ps1 ..>nul & POPD
-ECHO. & ECHO Requesting Download from Microsoft...
-FOR /f "delims=" %%A in ('powershell -nop -executionpolicy unrestricted -c ".\fido.ps1 -Win 11 -Lang Eng -Arch x64 -GetUrl"') DO SET "link=%%A"
-SET link=%link:&=^&%
+IF EXIST download.link (
+FORFILES /d -1 /m "download.link" >NUL 2>NUL && (
+DEL download.link
+CALL :GETLINK
+) || (
+ECHO. & ECHO Re-Using Existing Download Link...
+SET /p link=<download.link
+)
+) ELSE (
+CALL :GETLINK
+)
 ECHO. & ECHO Starting ISO Download...
-"%TempDL%\aria2c.exe" --summary-interval=0 --max-connection-per-server=5 "%link%" -o Win11_Eng_x64.iso
+"%TempDL%\aria2c.exe" --summary-interval=0 --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
 MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul
 SET ISO="%~dp0Win11_Eng_x64.iso"
 POPD
+ENDLOCAL
+EXIT /b
+:GETLINK
+ECHO. & ECHO Requesting Download from Microsoft...
+FOR /f "delims=" %%A in ('powershell -nop -executionpolicy unrestricted -c ".\fido.ps1 -Win 11 -Lang Eng -Arch x64 -GetUrl"') DO SET "link=%%A"
+ECHO !link!>download.link
 EXIT /b
