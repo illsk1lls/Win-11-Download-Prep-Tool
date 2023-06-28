@@ -136,7 +136,7 @@ POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releas
 7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE Fido.ps1 ..>nul & POPD
 IF EXIST download.link (
 FORFILES /d -1 /m "download.link" >NUL 2>NUL && (
-DEL download.link
+DEL "%TempDL%\download.link" /F /Q>nul
 CALL :GETLINK
 ) || (
 ECHO. & ECHO Re-Using Existing Download Link...
@@ -146,7 +146,12 @@ SET /p link=<download.link
 CALL :GETLINK
 )
 IF EXIST Win11_Eng_x64.iso (
+FORFILES /d -3 /m "Win11_Eng_x64.iso" >NUL 2>NUL && (
+DEL "%TempDL%\Win11_Eng_x64.iso" /F /Q>nul
+ECHO. & ECHO Starting ISO Download...
+) || (
 ECHO. & ECHO Resuming ISO Download...
+)
 ) ELSE (
 ECHO. & ECHO Starting ISO Download...
 )
