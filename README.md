@@ -1,16 +1,15 @@
 # Win-11-Download-Prep-Tool<br>
-<b>Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements. In addition to turning off S-Mode (SecureBoot may need to be disabled as well)<b><br>
+Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements. In addition to turning off S-Mode *SecureBoot may need to be disabled as well for S-Mode*<br>
 <br>
-
-<b>Credit to:</b><br>
+Credit to:<br>
 P. Batard - <a href="https://github.com/pbatard/Fido">https://github.com/pbatard/Fido</a><br>
 Wimlib-Imagex - <a href="https://wimlib.net">https://wimlib.net</a><br>
 Aria2c - <a href="https://github.com/aria2/aria2">https://github.com/aria2/aria2</a><br>
 7zip - <a href="https://www.7zip.org">https://www.7zip.org</a><br>
 wikijim - <a href="https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1">https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1</a><br>
-
+<br>
 Additional Changes to Win 11 ISO:<br>
-
+<br>
 Disable UAC<br>
 Classic Context Menus<br>
 Decrease Space Between Items (Compact View)<br>
@@ -19,11 +18,24 @@ Show File Extensions<br>
 <br>
 Note: Running from UNC paths is currently not supported.<br>
 <br>
+Instructions:<br>
+1.) Double click the tool to download a new ISO directly from Microsoft and prep the image. <br>
+The final ISO will appear in the same folder you ran the script from.<br>
 <br>
-<b>Instructions:</b><br>
-<b>1.)</b> Double click the tool to download a new ISO directly from Microsoft and prep the image. <br>
-<b>*</b>The final ISO will appear in the same folder you ran the script from.<br>
-
-<b>--Alternatively--</b><br>
+--Alternatively--<br>
 You can drop an existing Win11 ISO onto the script using the mouse drag-and-drop. Doing this will skip the download and prep the ISO you provide.<br>
-<b>*</b>The script will rebuild the ISO in its original location.<br>
+The script will rebuild the ISO in its original location.<br>
+<br>
+What does it do?<br>
+<br>
+The script first checks to see if it is running as administrator, if so it continues, if not it requests admin rights (if you already have rights it will elevate itself.)<br>
+The script will check to see if you Dropped a file onto it, or if you just executed it without a dropped file. If you dropped an existing ISO on the script it will create<br> 
+a temp folder in ProgramData, and download 7zip and Wimlib with powershell's Invoke-WebRequest command to that folder. If you did NOT drop drop an ISO onto the script it will use powershell to<br>
+download Fido from Git and run CLI to get it to fetch a fresh download link from MS. The script will preserve the MS download link for up to 24hours and re-use it to avoid spamming<br>
+MS download servers with requests. The link can be re-used as many times as possible until it expires(24hrs) at which point the script will see it has expired and ask for a new one<br>
+With no ISO dropped onto the script it will fetch Aria2c from Git in addition the the link request. The script then begins the ISO download directly from Microsoft. Download resume is enabled.<br>
+If the script is closed during the download, you can re-open the script and the download will pick up where it left off (the script will resume for up to 72hrs only to avoid version mismatch, <br>
+if a partial download remians after 72 hours it will be removed and a new ISO will be requested.). Once the download is complete the ISO is mounted with powershell, and extracted to its own<br>
+temp folder in ProgramData. Wimlib-Imagex is then used to extract the registry hives from each index (Edition), make changes, then inject the updated registry hivesback into the Windows image, <br>
+until all indexes are updated. Once the Windows image has been updated the script downloads the "New-IsoFile.ps1" powershell function from Git and appends the function with the appropriate<br>
+commands to re-author the ISO with the new image. The script then cleans up after itself, leaving only the download link to be used if it is run again within 24hrs. And of course the ISO! ;)<br>
