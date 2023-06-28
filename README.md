@@ -23,22 +23,21 @@ Instructions:<br>
 The final ISO will appear in the same folder you ran the script from.<br>
 <br>
 --Alternatively--<br>
-You can drop an existing Win11 ISO onto the script using the mouse drag-and-drop. Doing this will skip the download and prep the ISO you provide.<br>
-The script will rebuild the ISO in its original location.<br>
+You can drop an existing Win11 ISO onto the script using the mouse drag-and-drop. Doing this will skip the download and prep the ISO you provide. The script will rebuild the ISO in its original location.<br>
 <br>
 What does it do?<br>
 <br>
-The script first checks to see if it is running as administrator, if so it continues, if not it requests admin rights (if you already have rights it will<br>
-elevate itself.) The script will check to see if you Dropped a file onto it, or if you just executed it without a dropped file. If you dropped an <br>
-existing ISO on the script it will create a temp folder in ProgramData, and download 7zip and Wimlib with powershell's Invoke-WebRequest command to that<br>
-folder. If you did NOT drop drop an ISO onto the script it will use powershell todownload Fido from Git and run CLI to get it to fetch a fresh download<br>
-link from MS. The script will preserve the MS download link for up to 24hours and re-use it to avoid spammingMS download servers with requests. The link<br>
-can be re-used as many times as possible until it expires(24hrs) at which point the script will see it has expired and ask for a new one With no ISO<br>
-dropped onto the script it will fetch Aria2c from Git in addition the the link request. The script then begins the ISO download directly from Microsoft.<br>
-Download resume is enabled. If the script is closed during the download, you can re-open the script and the download will pick up where it left off (the<br>
-script will resume for up to 72hrs only to avoid version mismatch, if a partial download remians after 72 hours it will be removed and a new ISO will be<br>
-requested.). Once the download is complete the ISO is mounted with powershell, and extracted to its own temp folder in ProgramData. Wimlib-Imagex is then<br>
-used to extract the registry hives from each index (Edition), make changes, then inject the updated registry hivesback into the Windows image, until all<br>
-indexes are updated. Once the Windows image has been updated the script downloads the "New-IsoFile.ps1" powershell function from Git and appends the<br>
-function with the appropriate commands to re-author the ISO with the new image. The script then cleans up after itself, leaving only the download link to<br>
-be used if it is run again within 24hrs. And of course the ISO! ;)<br>
+The script first checks to see if it is running as administrator, if so it continues, if not it requests admin rights (if you already have rights it will
+elevate itself.) The script will check to see if you Dropped a file onto it, or if you just executed it without a dropped file. If you dropped an 
+existing ISO on the script it will create a temp folder in ProgramData, and download 7zip and Wimlib with powershell's Invoke-WebRequest command to that
+folder. If you did NOT drop drop an ISO onto the script it will use powershell todownload Fido from Git and run CLI to get it to fetch a fresh download
+link from MS. The script will preserve the MS download link for up to 24hours and re-use it to avoid spammingMS download servers with requests. The link
+can be re-used as many times as possible until it expires(24hrs) at which point the script will see it has expired and ask for a new one With no ISO
+dropped onto the script it will fetch Aria2c from Git in addition the the link request. The script then begins the ISO download directly from Microsoft.
+Download resume is enabled. If the script is closed during the download, you can re-open the script and the download will pick up where it left off (the
+script will resume for up to 72hrs only to avoid version mismatch, if a partial download remians after 72 hours it will be removed and a new ISO will be
+requested.). Once the download is complete the ISO is mounted with powershell, and extracted to its own temp folder in ProgramData. Wimlib-Imagex is then
+used to extract the registry hives from each index (Edition), make changes, then inject the updated registry hivesback into the Windows image, until all
+indexes are updated. Once the Windows image has been updated the script downloads the "New-IsoFile.ps1" powershell function from Git and appends the
+function with the appropriate commands to re-author the ISO with the new image. The script then cleans up after itself, leaving only the download link to
+be used if it is run again within 24hrs. And of course the ISO! ;)
