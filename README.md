@@ -31,7 +31,7 @@ The script first checks to see if it is running as administrator, if so it conti
 elevate itself.) It checks to see if you Dropped a file onto it, or if you just executed it without a dropped file. If you dropped an existing ISO on the
 script, the ISO download will be skipped, it will create a temp folder in ProgramData, and download 7zip and Wimlib only with powershell's Invoke-WebRequest
 command. If you did NOT drop drop an ISO onto the script it will use powershell to donwload the above + Aria2c/Fido from Git and run CLI to fetch a fresh
-link from MS. The script will preserve the MS download link for up to 24hours and re-use it to avoid spammingMS download servers with requests. The link
+link from MS. The script will preserve the MS download link for up to 24hours and re-use it to avoid spamming MS download servers with requests. The link
 can be re-used as many times as possible until it expires(24hrs) at which point the script will see it has expired and ask for a new one. The script then 
 begins the ISO download directly from Microsoft.
 Download resume is enabled. If the script is closed during the download, you can re-open the script and the download will pick up where it left off (the
