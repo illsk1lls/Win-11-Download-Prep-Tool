@@ -1,4 +1,5 @@
 @ECHO OFF
+SETLOCAL ENABLEDELAYEDEXPANSION
 TITLE Windows 11 - Download and System Prep Tool
 >nul 2>&1 REG add HKCU\Software\classes\.Admin\shell\runas\command /f /ve /d "cmd /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
 >nul 2>&1 FLTMC|| IF "%f0%" neq "%~f0" (CD.>"%ProgramData%\runas.Admin" & START "%~n0" /high "%ProgramData%\runas.Admin" "%~f0" "%_:"=""%" & EXIT /b)
@@ -16,14 +17,10 @@ CALL :DOWNLOADISO
 CALL :DOWNLOADTOOLS
 POPD & POPD
 )
-SET ISO=%ISO:^=^^%
-SET ISO=%ISO:&=^&%
-SET ISO=%ISO:(=^(%
-SET ISO=%ISO:)=^)%
 ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0WimFix.log"
 CALL :XBUTTON false
 TITLE Mounting/Extracting ISO
-POWERSHELL "Mount-DiskImage ""%ISO%""">>"%~dp0WimFix.log"
+POWERSHELL "Mount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
 FOR /f "tokens=3 delims=\:" %%d IN ('reg query hklm\system\mounteddevices ^| findstr /c:"5C003F00" ^| findstr /v "{.*}"') do (  
 IF EXIST "%%d:\sources\install.wim" SET SOURCE=%%d
 )
@@ -32,7 +29,7 @@ IF EXIST "%rootfolder%" RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
 MD "%mountdir%">>"%~dp0WimFix.log"
 CLS & ECHO. & ECHO Getting Ready, please wait...& ECHO. & ECHO Extracting ISO...
 XCOPY "%SOURCE%:\" "%rootfolder%\" /E /H /C /I /Y>>"%~dp0WimFix.log"
-POWERSHELL "Dismount-DiskImage ""%ISO%""">>"%~dp0WimFix.log"
+POWERSHELL "Dismount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
 PUSHD "%folder%"
 SETLOCAL ENABLEDELAYEDEXPANSION
 FOR /F "usebackq tokens=3" %%i IN (`dism /get-wiminfo /wimfile:"%folder%\install.wim"`) DO (
@@ -89,11 +86,19 @@ GOTO APPLY
 TITLE Please Wait...
 POPD
 ECHO. & ECHO Updating ISO, please wait...
-CALL :MAKEISO %ISO%
+CALL :MAKEISO
 DEL "%ProgramData%\MakeIso.ps1" /f /q>nul
 ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
 RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
+IF EXIST "%TempDL%\download.link" (
+MOVE /Y "%TempDL%\download.link" "%ProgramData%">>"%~dp0WimFix.log"
 RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
+MD "%TempDL%">>"%~dp0WimFix.log"
+MOVE /Y "%ProgramData%\download.link" "%TempDL%">>"%~dp0WimFix.log"
+) ELSE (
+RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
+)
+ENDLOCAL
 TITLE Process Complete!
 ECHO. & ECHO Process Complete! ISO Updated! & ECHO.
 CALL :XBUTTON true
@@ -104,10 +109,9 @@ POWERSHELL -nop -c "(Add-Type -PassThru 'using System; using System.Runtime.Inte
 EXIT /b
 :MAKEISO
 TITLE Rebuilding ISO
-SET ISO=%ISO:^=%
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/wikijm/PowerShell-AdminScripts/master/Miscellaneous/New-IsoFile.ps1 -o '%ProgramData%\MakeIso.ps1'"
 ECHO $source_dir = "%rootfolder%">>"%ProgramData%\MakeIso.ps1"
-ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path %ISO% -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win11-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
+ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path !ISO! -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win11-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
 POWERSHELL -executionpolicy unrestricted -file "%ProgramData%\MakeIso.ps1">nul
 EXIT /b
 :DOWNLOADTOOLS
@@ -124,7 +128,6 @@ POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7
 7zr.exe e -y 7zExtra.7z>nul & 7za.exe e -y wimlib.zip libwim-15.dll -r -o..>nul & 7za.exe e -y wimlib.zip wimlib-imagex.exe -r -o..>nul
 EXIT /b
 :DOWNLOADISO
-SETLOCAL ENABLEDELAYEDEXPANSION
 CALL :DOWNLOADTOOLS
 TITLE Getting Windows 11
 CLS
@@ -142,12 +145,15 @@ SET /p link=<download.link
 ) ELSE (
 CALL :GETLINK
 )
+IF EXIST Win11_Eng_x64.iso (
+ECHO. & ECHO Resuming ISO Download...
+) ELSE (
 ECHO. & ECHO Starting ISO Download...
-"%TempDL%\aria2c.exe" --summary-interval=0 --file-allocation=falloc --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
+)
+"%TempDL%\aria2c.exe" --summary-interval=0 --file-allocation=none --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
 MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul
 SET ISO="%~dp0Win11_Eng_x64.iso"
 POPD
-ENDLOCAL
 EXIT /b
 :GETLINK
 ECHO. & ECHO Requesting Download from Microsoft...
