@@ -143,7 +143,7 @@ SET /p link=<download.link
 CALL :GETLINK
 )
 ECHO. & ECHO Starting ISO Download...
-"%TempDL%\aria2c.exe" --summary-interval=0 --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
+"%TempDL%\aria2c.exe" --summary-interval=0 --file-allocation=falloc --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
 MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul
 SET ISO="%~dp0Win11_Eng_x64.iso"
 POPD
