@@ -1,9 +1,9 @@
-# Win-11-Download-Prep-Tool
-Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements.
-
-Additional Changes to Win 11 ISO:
-Disable S-Mode (SecureBoot may need to be disabled as well)
-Disable UAC
+# Win-11-Download-Prep-Tool<br>
+Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements.<br>
+<br>
+Additional Changes to Win 11 ISO:<br>
+Disable S-Mode (SecureBoot may need to be disabled as well)<br>
+Disable UAC<br>
 Classic Context Menus
 Decrease Space Between Items (Compact View)
 Show Hidden Files
