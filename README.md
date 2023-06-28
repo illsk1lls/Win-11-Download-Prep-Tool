@@ -16,5 +16,5 @@ Instructions:
   *The final ISO will appear in the same folder you ran the script from.
 
 --Alternatively--
-You can drop an existing ISO onto the script using the mouse drag-and-drop, and it will skip the download and prep the ISO you provide.
-When the script completes the ISO you dropped will be updated.
+ You can drop an existing Win11 ISO onto the script using the mouse drag-and-drop. Doing this will skip the download and prep the ISO you provide.
+ *The script will rebuild the ISO in its original location.
