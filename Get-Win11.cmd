@@ -5,6 +5,7 @@ TITLE Windows 11 - Download and System Prep Tool
 >nul 2>&1 FLTMC|| IF "%f0%" neq "%~f0" (CD.>"%ProgramData%\runas.Admin" & START "%~n0" /high "%ProgramData%\runas.Admin" "%~f0" "%_:"=""%" & EXIT /b)
 >nul 2>&1 REG delete HKCU\Software\classes\.Admin\ /f
 >nul 2>&1 DEL "%ProgramData%\runas.Admin" /f /q
+ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0WimFix.log" & ECHO.>>"%~dp0WimFix.log"
 SET ISO=%1
 SET currentindex=1
 SET "rootfolder=%ProgramData%\TempSysPrep"
@@ -17,7 +18,6 @@ CALL :DOWNLOADISO
 CALL :DOWNLOADTOOLS
 POPD & POPD
 )
-ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0WimFix.log"
 CALL :XBUTTON false
 TITLE Mounting/Extracting ISO
 POWERSHELL "Mount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
@@ -88,17 +88,18 @@ POPD
 ECHO. & ECHO Updating ISO, please wait...
 CALL :MAKEISO
 DEL "%ProgramData%\MakeIso.ps1" /f /q>nul
-ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
+ECHO.>>"%~dp0WimFix.log"
 RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
 IF EXIST "%TempDL%\download.link" (
 MOVE /Y "%TempDL%\download.link" "%ProgramData%">nul && (ECHO download.link moved out of %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.link out of %TempDL%>>"%~dp0WimFix.log")
 RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
 MD "%TempDL%">>"%~dp0WimFix.log"
-MOVE /Y "%ProgramData%\download.link" "%TempDL%">nul && (ECHO download.link moved into %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.link into %TempDL%>>"%~dp0WimFix.log")
+MOVE /Y "%ProgramData%\download.link" "%TempDL%">nul && (ECHO download.link moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.link to %TempDL%>>"%~dp0WimFix.log")
 ) ELSE (
 RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
 )
 ENDLOCAL
+ECHO.>>"%~dp0WimFix.log" & ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
 TITLE Process Complete!
 ECHO. & ECHO Process Complete! ISO Updated! & ECHO.
 CALL :XBUTTON true
@@ -133,7 +134,7 @@ TITLE Getting Windows 11
 CLS
 ECHO. & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
-7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE Fido.ps1 ..>nul && (ECHO Fido.ps1 moved into %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 into %TempDL%>>"%~dp0WimFix.log") & POPD
+7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE Fido.ps1 ..>nul && (ECHO Fido.ps1 moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 to %TempDL%>>"%~dp0WimFix.log") & POPD
 IF EXIST download.link (
 FORFILES /d -1 /m "download.link" >NUL 2>NUL && (
 DEL "%TempDL%\download.link" /F /Q>nul
@@ -156,7 +157,7 @@ ECHO. & ECHO Resuming ISO Download...
 ECHO. & ECHO Starting ISO Download...
 )
 "%TempDL%\aria2c.exe" --continue=true --summary-interval=0 --file-allocation=none --auto-file-renaming=false --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
-MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul && (ECHO Win11_Eng_x64.iso moved into %~dp0>>"%~dp0WimFix.log") || (ECHO Error moving Win11_Eng_x64.iso into %~dp0>>"%~dp0WimFix.log")
+MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul && (ECHO Download completed and Win11_Eng_x64.iso moved to %~dp0>>"%~dp0WimFix.log") || (ECHO Error moving Win11_Eng_x64.iso to %~dp0>>"%~dp0WimFix.log")
 SET ISO="%~dp0Win11_Eng_x64.iso"
 POPD
 EXIT /b
