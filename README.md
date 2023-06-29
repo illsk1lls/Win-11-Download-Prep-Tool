@@ -25,7 +25,7 @@ The final ISO will appear in the same folder you ran the script from.<br>
 --Alternatively--<br>
 You can drop an existing Win11 ISO onto the script using the mouse drag-and-drop. Doing this will skip the download and prep the ISO you provide. The script will rebuild the ISO in its original location.<br>
 <br>
-What does it do?<br>
+How does it work?<br>
 <br>
 The script first checks to see if it is running as administrator, if so it continues, if not it requests admin rights (if you already have rights it will
 elevate itself.) It checks to see if you Dropped a file onto it, or if you just executed it without a dropped file. If you dropped an existing ISO on the
