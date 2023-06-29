@@ -5,7 +5,7 @@ Credit to:<br>
 P. Batard - <a href="https://github.com/pbatard/Fido">https://github.com/pbatard/Fido</a><br>
 Wimlib-Imagex - <a href="https://wimlib.net">https://wimlib.net</a><br>
 Aria2c - <a href="https://github.com/aria2/aria2">https://github.com/aria2/aria2</a><br>
-7zip - <a href="https://www.7zip.org">https://www.7zip.org</a><br>
+7zip - <a href="https://www.7-zip.org/">https://www.7-zip.org/</a><br>
 wikijim - <a href="https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1">https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1</a><br>
 <br>
 Additional Changes to Win 11 ISO:<br>
