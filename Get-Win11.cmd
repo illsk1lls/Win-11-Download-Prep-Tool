@@ -51,9 +51,9 @@ ECHO.
 "%TempDL%\wimlib-imagex.exe" extract install.wim %currentindex% /Users/Default/ntuser.dat --dest-dir="%reversepath%/%currentindex%"
 ECHO.
 ECHO Updating Registry of Index %currentindex%...
-REG load HKLM\tmp_software "%reversepath%/%currentindex%\software">>"%~dp0WimFix.log"
-REG load HKLM\tmp_system "%reversepath%/%currentindex%\system">>"%~dp0WimFix.log"
-REG load HKU\tmp_default "%reversepath%/%currentindex%\ntuser.dat">>"%~dp0WimFix.log"
+REG load HKLM\tmp_software "%folder%\%currentindex%\software">>"%~dp0WimFix.log"
+REG load HKLM\tmp_system "%folder%\%currentindex%\system">>"%~dp0WimFix.log"
+REG load HKU\tmp_default "%folder%\%currentindex%\ntuser.dat">>"%~dp0WimFix.log"
 REG add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_system\ControlSet001\Control\CI\Policy /v SkuPolicyRequired /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
