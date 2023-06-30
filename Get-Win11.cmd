@@ -76,7 +76,6 @@ ECHO.
 ECHO.
 RD "%folder%\%currentindex%" /s /q>>"%~dp0WimFix.log"
 ) ELSE (
-ENDLOCAL
 GOTO FINALIZE
 )
 SET /a currentindex+=1
