@@ -31,7 +31,6 @@ CLS & ECHO. & ECHO Getting Ready, please wait...& ECHO. & ECHO Extracting ISO...
 XCOPY "%SOURCE%:\" "%rootfolder%\" /E /H /C /I /Y>>"%~dp0WimFix.log"
 POWERSHELL "Dismount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
 PUSHD "%folder%"
-SETLOCAL ENABLEDELAYEDEXPANSION
 FOR /F "usebackq tokens=3" %%i IN (`dism /get-wiminfo /wimfile:"%folder%\install.wim"`) DO (
 SET index=%%i
 SET index=!index:,=!
