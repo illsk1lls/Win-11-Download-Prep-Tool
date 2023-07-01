@@ -60,6 +60,10 @@ REG add HKLM\tmp_system\Setup\MoSetup /v AllowUpgradesWithUnsupportedTPMOrCPU /t
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_system\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+"%TempDL%\SetACL.exe" -on "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -ot reg -actn setowner -ownr "n:Administrators" -rec Yes>>"%~dp0WimFix.log"
+"%TempDL%\SetACL.exe" -on "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -ot reg -actn ace -ace "n:Administrators;p:full" -rec Yes>>"%~dp0WimFix.log"
+REG delete HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /f>>"%~dp0WimFix.log"
+REG add HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /t REG_SZ /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_default\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32 /ve /t REG_SZ /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add HKLM\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
@@ -123,8 +127,8 @@ IF EXIST "%TempDL%\Junkbin" RD "%TempDL%\Junkbin" /S /Q>nul
 MD "%TempDL%\Junkbin">nul
 ECHO. & ECHO Getting Tools...
 PUSHD "%TempDL%" & PUSHD "%TempDL%\Junkbin"
-POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7zr.exe'"; "Invoke-WebRequest -Uri https://www.7-zip.org/a/7z2300-extra.7z -o '7zExtra.7z'"; "Invoke-WebRequest -Uri https://wimlib.net/downloads/wimlib-1.14.1-windows-x86_64-bin.zip -o 'wimlib.zip'"
-7zr.exe e -y 7zExtra.7z>nul & 7za.exe e -y wimlib.zip libwim-15.dll -r -o..>nul & 7za.exe e -y wimlib.zip wimlib-imagex.exe -r -o..>nul
+POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7zr.exe'"; "Invoke-WebRequest -Uri https://www.7-zip.org/a/7z2300-extra.7z -o '7zExtra.7z'"; "Invoke-WebRequest -Uri https://wimlib.net/downloads/wimlib-1.14.1-windows-x86_64-bin.zip -o 'wimlib.zip'"; "Invoke-WebRequest -Uri https://helgeklein.com/downloads/SetACL/current/SetACL%%203.1.2%%20`(executable%%20version`).zip -o 'SetACL.zip'"
+7zr.exe e -y 7zExtra.7z>nul & 7za.exe e -y wimlib.zip libwim-15.dll -r -o..>nul & 7za.exe e -y wimlib.zip wimlib-imagex.exe -r -o..>nul & 7za.exe e -y SetACL.zip "SetACL (executable version)\64 bit\SetACL.exe" -r -o..>nul
 EXIT /b
 :DOWNLOADISO
 CALL :DOWNLOADTOOLS
