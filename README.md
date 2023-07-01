@@ -10,6 +10,7 @@ wikijim - <a href="https://github.com/wikijm/PowerShell-AdminScripts/blob/master
 <br>
 Additional Changes to Win 11 ISO:<br>
 <br>
+Enable Legacy F8 Boot Menu<br>
 Disable UAC<br>
 Classic Context Menus<br>
 Decrease Space Between Items (Compact View)<br>
