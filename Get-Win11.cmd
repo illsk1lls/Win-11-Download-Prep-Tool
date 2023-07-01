@@ -136,7 +136,7 @@ TITLE Getting Windows 11
 CLS
 ECHO. & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
-7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE Fido.ps1 ..>nul && (ECHO Fido.ps1 moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 to %TempDL%>>"%~dp0WimFix.log") & POPD
+7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE /Y Fido.ps1 ..>nul && (ECHO Fido.ps1 moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 to %TempDL%>>"%~dp0WimFix.log") & POPD
 IF EXIST download.link (
 FORFILES /d -1 /m "download.link" >NUL 2>NUL && (
 DEL "%TempDL%\download.link" /F /Q>nul
