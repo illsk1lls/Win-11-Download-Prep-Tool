@@ -7,10 +7,12 @@ Wimlib-Imagex - <a href="https://wimlib.net">https://wimlib.net</a><br>
 Aria2c - <a href="https://github.com/aria2/aria2">https://github.com/aria2/aria2</a><br>
 7zip - <a href="https://www.7-zip.org/">https://www.7-zip.org/</a><br>
 wikijim - <a href="https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1">https://github.com/wikijm/PowerShell-AdminScripts/blob/master/Miscellaneous/New-IsoFile.ps1</a><br>
-Helge Klein - <a hreaf="https://helgeklein.com/setacl/">https://helgeklein.com/setacl/</a><br>
+Helge Klein - <a href="https://helgeklein.com/setacl/">https://helgeklein.com/setacl/</a><br>
+AveYo - <a href="https://github.com/AveYo/MediaCreationTool.bat/blob/main/bypass11/Skip_TPM_Check_on_Dynamic_Update.cmd">https://github.com/AveYo/MediaCreationTool.bat/blob/main/bypass11/Skip_TPM_Check_on_Dynamic_Update.cmd</a></br>
 <br>
 Additional Changes to Win 11 ISO:<br>
 <br>
+Allows in place upgrade on live unsupported system (From mounted ISO)
 Enable Legacy F8 Boot Menu<br>
 Disable UAC<br>
 Classic Context Menus<br>
@@ -40,6 +42,7 @@ download will pick up where it left off (the script will resume for up to 72hrs 
 it will be removed and a new ISO will be requested.). Once the download is complete the ISO is mounted with powershell, and extracted to its own temp folder in 
 ProgramData, then unmounted. Wimlib-Imagex is then used to extract the registry hives from each index (Edition), make changes, then inject the updated registry 
 hives back into the Windows image, until all indexes are updated. Once the Windows image has been updated the script downloads the "New-IsoFile.ps1" powershell 
-function from Git and appends the function with the appropriate commands to re-author the ISO with the new image. If the script completes it cleans up after
-itself, leaving only the download link to be used if it is run again within 24hrs. And of course the ISO! ;) If it does not complete, the partial downloaded 
-files and links will remain in ProgramData and be referenced the next time the script is run.
+function from Git and appends the function with the appropriate commands to re-author the ISO with the new image. A CMD script is placed at the root of the ISO to
+allow upgrades on unsupported machines via mounted ISO. If the script completes it cleans up after itself, leaving only the download link to be used if it is run 
+again within 24hrs. And of course the ISO! ;) If it does not complete, the partial downloaded files and links will remain in ProgramData and be referenced the next
+time the script is run.
