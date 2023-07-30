@@ -1,10 +1,14 @@
 @ECHO OFF
 SETLOCAL ENABLEDELAYEDEXPANSION
-TITLE Windows 11 - Download and System Prep Tool
->nul 2>&1 REG add HKCU\Software\classes\.Admin\shell\runas\command /f /ve /d "cmd /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
->nul 2>&1 FLTMC|| IF "%f0%" neq "%~f0" (CD.>"%ProgramData%\runas.Admin" & START "%~n0" /high "%ProgramData%\runas.Admin" "%~f0" "%_:"=""%" & EXIT /b)
->nul 2>&1 REG delete HKCU\Software\classes\.Admin\ /f
->nul 2>&1 DEL "%ProgramData%\runas.Admin" /f /q
+SET VERSION=%~n0
+SET VERSION=%VERSION:~-1%
+IF NOT 1%VERSION% == 10 (
+SET VERSION=1
+)
+TITLE Windows 1%VERSION% - Download and System Prep Tool
+>nul 2>&1 REG ADD HKCU\Software\Classes\.GetWin\shell\runas\command /f /ve /d "CMD /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
+>nul 2>&1 FLTMC||(CD.>"%temp%\elevate.GetWin" & START "%~n0" /high "%temp%\elevate.GetWin" "%~f0" "%_:"=""%" & EXIT /b)
+>nul 2>&1 REG DELETE HKCU\Software\Classes\.GetWin\ /f &>nul 2>&1 DEL %temp%\elevate.GetWin /f
 ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0WimFix.log" & ECHO.>>"%~dp0WimFix.log"
 SET ISO=%1
 SET currentindex=1
@@ -88,25 +92,26 @@ GOTO APPLY
 :FINALIZE
 TITLE Please Wait...
 POPD
+CALL :ADDUNSUPPORTEDCMD
 ECHO. & ECHO Updating ISO, please wait...
 CALL :MAKEISO
 DEL "%ProgramData%\MakeIso.ps1" /f /q>nul
 ECHO.>>"%~dp0WimFix.log"
 RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
-IF EXIST "%TempDL%\download.link" (
-MOVE /Y "%TempDL%\download.link" "%ProgramData%">nul && (ECHO download.link moved out of %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.link out of %TempDL%>>"%~dp0WimFix.log")
+IF EXIST "%TempDL%\download.1%VERSION%.link" (
+MOVE /Y "%TempDL%\download.1%VERSION%.link" "%ProgramData%">nul && (ECHO download.1%VERSION%.link moved out of %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.1%VERSION%.link out of %TempDL%>>"%~dp0WimFix.log")
 RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
 MD "%TempDL%">>"%~dp0WimFix.log"
-MOVE /Y "%ProgramData%\download.link" "%TempDL%">nul && (ECHO download.link moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.link to %TempDL%>>"%~dp0WimFix.log")
+MOVE /Y "%ProgramData%\download.1%VERSION%.link" "%TempDL%">nul && (ECHO download.1%VERSION%.link moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving download.1%VERSION%.link to %TempDL%>>"%~dp0WimFix.log")
 ) ELSE (
 RD "%TempDL%" /S /Q>>"%~dp0WimFix.log"
 )
-ENDLOCAL
 ECHO.>>"%~dp0WimFix.log" & ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0WimFix.log"
-TITLE Process Complete!
-ECHO. & ECHO Process Complete! ISO Updated! & ECHO.
+TITLE Process Complete.
+ECHO. & ECHO Process Complete.. & ECHO. & ECHO ISO Updated & ECHO. & ECHO "Win1!VERSION!_Eng_x64.iso" is located in the same folder as this script. ;^) & ECHO.
 CALL :XBUTTON true
 PAUSE
+ENDLOCAL
 EXIT /b
 :XBUTTON
 POWERSHELL -nop -c "(Add-Type -PassThru 'using System; using System.Runtime.InteropServices; namespace CloseButtonToggle { internal static class WinAPI { [DllImport(\"kernel32.dll\")] internal static extern IntPtr GetConsoleWindow(); [DllImport(\"user32.dll\")] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags); [DllImport(\"user32.dll\")] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool DrawMenuBar(IntPtr hWnd); [DllImport(\"user32.dll\")] internal static extern IntPtr GetSystemMenu(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)]bool bRevert); const uint SC_CLOSE = 0xf060; const uint MF_BYCOMMAND = 0; internal static void ChangeCurrentState(bool state) { IntPtr hMenu = GetSystemMenu(GetConsoleWindow(), state); DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND); DrawMenuBar(GetConsoleWindow()); } } public static class Status { public static void Disable() { WinAPI.ChangeCurrentState(%1); } } }')[-1]::Disable()"
@@ -115,7 +120,8 @@ EXIT /b
 TITLE Rebuilding ISO
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/wikijm/PowerShell-AdminScripts/master/Miscellaneous/New-IsoFile.ps1 -o '%ProgramData%\MakeIso.ps1'"
 ECHO $source_dir = "%rootfolder%">>"%ProgramData%\MakeIso.ps1"
-ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path !ISO! -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win11-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
+ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path "%~dp0Win1%VERSION%_Eng_x64.iso" -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win1%VERSION%-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
+POWERSHELL "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
 POWERSHELL -executionpolicy unrestricted -file "%ProgramData%\MakeIso.ps1">nul
 EXIT /b
 :DOWNLOADTOOLS
@@ -133,25 +139,25 @@ POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7
 EXIT /b
 :DOWNLOADISO
 CALL :DOWNLOADTOOLS
-TITLE Getting Windows 11
+TITLE Getting Windows 1%VERSION%
 CLS
 ECHO. & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
 7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE /Y Fido.ps1 ..>nul && (ECHO Fido.ps1 moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 to %TempDL%>>"%~dp0WimFix.log") & POPD
-IF EXIST download.link (
-FORFILES /d -1 /m "download.link" >NUL 2>NUL && (
-DEL "%TempDL%\download.link" /F /Q>nul
+IF EXIST download.1%VERSION%.link (
+FORFILES /d -1 /m "download.1%VERSION%.link" >NUL 2>NUL && (
+DEL "%TempDL%\download.1%VERSION%.link" /F /Q>nul
 CALL :GETLINK
 ) || (
 ECHO. & ECHO Re-Using Existing Download Link...
-SET /p link=<download.link
+SET /p link=<download.1%VERSION%.link
 )
 ) ELSE (
 CALL :GETLINK
 )
-IF EXIST Win11_Eng_x64.iso (
-FORFILES /d -3 /m "Win11_Eng_x64.iso" >NUL 2>NUL && (
-DEL "%TempDL%\Win11_Eng_x64.iso" /F /Q>nul
+IF EXIST Win1%VERSION%_Eng_x64.iso (
+FORFILES /d -3 /m "Win1%VERSION%_Eng_x64.iso" >NUL 2>NUL && (
+DEL "%TempDL%\Win1%VERSION%_Eng_x64.iso" /F /Q>nul
 ECHO. & ECHO Starting ISO Download...
 ) || (
 ECHO. & ECHO Resuming ISO Download...
@@ -159,13 +165,73 @@ ECHO. & ECHO Resuming ISO Download...
 ) ELSE (
 ECHO. & ECHO Starting ISO Download...
 )
-"%TempDL%\aria2c.exe" --continue=true --summary-interval=0 --file-allocation=none --auto-file-renaming=false --max-connection-per-server=5 "!link!" -o Win11_Eng_x64.iso
-MOVE /Y "Win11_Eng_x64.iso" "%~dp0">nul && (ECHO Download completed and Win11_Eng_x64.iso moved to %~dp0>>"%~dp0WimFix.log") || (ECHO Error moving Win11_Eng_x64.iso to %~dp0>>"%~dp0WimFix.log")
-SET ISO="%~dp0Win11_Eng_x64.iso"
+"%TempDL%\aria2c.exe" --continue=true --summary-interval=0 --file-allocation=none --auto-file-renaming=false --max-connection-per-server=5 "!link!" -o Win1%VERSION%_Eng_x64.iso
+POWERSHELL "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
+MOVE /Y "Win1%VERSION%_Eng_x64.iso" "%~dp0">nul && (ECHO Download completed and Win1%VERSION%_Eng_x64.iso moved to %~dp0>>"%~dp0WimFix.log") || (ECHO Error moving Win1%VERSION%_Eng_x64.iso to %~dp0>>"%~dp0WimFix.log")
+SET ISO="%~dp0Win1%VERSION%_Eng_x64.iso"
 POPD
 EXIT /b
 :GETLINK
 ECHO. & ECHO Requesting Download from Microsoft...
-FOR /f "delims=" %%A in ('powershell -nop -executionpolicy unrestricted -c ".\fido.ps1 -Win 11 -Lang Eng -Arch x64 -GetUrl"') DO SET "link=%%A"
-ECHO !link!>download.link
+FOR /f "delims=" %%A in ('powershell -nop -executionpolicy unrestricted -c ".\fido.ps1 -Win 1%VERSION% -Lang Eng -Arch x64 -GetUrl"') DO SET "link=%%A"
+ECHO !link!>download.1%VERSION%.link
+EXIT /b
+:ADDUNSUPPORTEDCMD
+(
+ECHO @^(set '^(=^)^|^|' ^<# lean and mean cmd / powershell hybrid #^> @'
+ECHO ::# Get Windows 11 on 'Unsupported' PCs via Windows Update or Mounted ISO - AveYo 2023.07.14
+ECHO @ECHO OFF ^& TITLE Allow Unsupported Windows 11 Upgrades via Windows Update or Mounted ISO
+ECHO if /i "%%~f0" neq "%%ProgramData%%\AllowUpgrades\AllowUpgrades.cmd" goto setup
+ECHO powershell -win 1 -nop -c ";"
+ECHO set CLI=%%*^& set SOURCES=%%SystemDrive%%\$WINDOWS.~BT\Sources^& set MEDIA=.^& set MOD=CLI^& set PRE=WUA^& set /a VER=11
+ECHO if not defined CLI ^(exit /b^) else if not exist %%SOURCES%%\SetupHost.exe ^(exit /b^)
+ECHO if not exist %%SOURCES%%\WindowsUpdateBox.exe mklink /h %%SOURCES%%\WindowsUpdateBox.exe %%SOURCES%%\SetupHost.exe
+ECHO reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /f /v DisableWUfBSafeguards /d 1 /t reg_dword
+ECHO reg add HKLM\SYSTEM\Setup\MoSetup /f /v AllowUpgradesWithUnsupportedTPMorCPU /d 1 /t reg_dword
+ECHO set OPT=/Compat IgnoreWarning /MigrateDrivers All /Telemetry Disable
+ECHO set /a restart_application=0x800705BB ^& ^(call set CLI=%%%%CLI:%%1 =%%%%^)
+ECHO set /a incorrect_parameter=0x80070057 ^& ^(set SRV=%%CLI:/Product Client =%%^)
+ECHO set /a launch_option_error=0xc190010a ^& ^(set SRV=%%SRV:/Product Server =%%^)
+ECHO for %%%%W in ^(%%CLI%%^) do if /i %%%%W == /PreDownload ^(set MOD=SRV^)
+ECHO for %%%%W in ^(%%CLI%%^) do if /i %%%%W == /InstallFile ^(set PRE=ISO^& set "MEDIA="^) else if not defined MEDIA set "MEDIA=%%%%~dpW"
+ECHO if %%VER%% == 11 for %%%%W in ^("%%MEDIA%%appraiserres.dll"^) do if exist %%%%W if %%%%~zW == 0 set AlreadyPatched=1 ^& set /a VER=10
+ECHO if %%VER%% == 11 findstr /r "P.r.o.d.u.c.t.V.e.r.s.i.o.n...1.0.\..0.\..2.[2-9]" %%SOURCES%%\SetupHost.exe ^>nul 2^>nul ^|^| set /a VER=10
+ECHO if %%VER%% == 11 if not exist "%%MEDIA%%EI.cfg" ^(echo;[Channel]^>%%SOURCES%%\EI.cfg ^& echo;_Default^>^>%%SOURCES%%\EI.cfg^)
+ECHO if %%VER%%_%%PRE%% == 11_ISO ^(%%SOURCES%%\WindowsUpdateBox.exe /Product Server /PreDownload /Quiet %%OPT%%^)
+ECHO if %%VER%%_%%PRE%% == 11_ISO ^(del /f /q %%SOURCES%%\appraiserres.dll 2^>nul ^& cd.^>%%SOURCES%%\appraiserres.dll^)
+ECHO if %%VER%%_%%MOD%% == 11_SRV ^(set ARG=%%OPT%% %%SRV%% /Product Server^)
+ECHO if %%VER%%_%%MOD%% == 11_CLI ^(set ARG=%%OPT%% %%CLI%%^)
+ECHO %%SOURCES%%\WindowsUpdateBox.exe %%ARG%%
+ECHO if %%errorlevel%% == %%restart_application%% %%SOURCES%%\WindowsUpdateBox.exe %%ARG%%
+ECHO exit /b
+ECHO :setup
+ECHO ^>nul 2^>^&1 REG ADD HKCU\Software\Classes\.AllowUpgrade\shell\runas\command /f /ve /d "CMD /x /d /r SET \"f0=%%%%2\"& call \"%%%%2\" %%%%3"^& set _= %%*
+ECHO ^>nul 2^>^&1 FLTMC^|^|^(CD.^>"%%temp%%\elevate.AllowUpgrade" ^& START "%%~n0" /high "%%temp%%\elevate.AllowUpgrade" "%%~f0" "%%_:"=""%%" & EXIT /b)
+ECHO ^>nul 2^>^&1 REG DELETE HKCU\Software\Classes\.AllowUpgrade\ /f ^&^>nul 2^>^&1 DEL %%temp%%\elevate.AllowUpgrade /f
+ECHO for /f "delims=:" %%%%s in ^('echo;prompt $h$s$h:^^^|cmd /d'^) do set "|=%%%%s"^&set ">>=\..\c nul&set /p s=%%%%s%%%%s%%%%s%%%%s%%%%s%%%%s%%%%s<nul&popd"
+ECHO set "<=pushd "%%appdata%%"&2>nul findstr /c:\ /a" ^&set ">=%%>>%%&echo;" ^&set "|=%%|:~0,1%%" ^&set /p s=\^<nul^>"%%appdata%%\c"
+ECHO set CLI=%%*^& ^(set IFEO=HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options^)
+ECHO wmic /namespace:"\\root\subscription" path __EventFilter where Name="AllowUnsupportedUpgrades" delete ^>nul 2^>nul ^& rem v1
+ECHO reg delete "%%IFEO%%\vdsldr.exe" /f 2^>nul ^& rem v2 - v5
+ECHO if /i "%%CLI%%"=="" reg query "%%IFEO%%\SetupHost.exe\0" /v Debugger ^>nul 2^>nul ^&^& goto remove ^|^| goto install
+ECHO if /i "%%~1"=="install" ^(goto install^) else if /i "%%~1"=="remove" goto remove
+ECHO :install
+ECHO mkdir %%ProgramData%%\AllowUpgrades ^>nul 2^>nul ^& copy /y "%%~f0" "%%ProgramData%%\AllowUpgrades\AllowUpgrades.cmd" ^>nul 2^>nul
+ECHO reg add "%%IFEO%%\SetupHost.exe" /f /v UseFilter /d 1 /t reg_dword ^>nul
+ECHO reg add "%%IFEO%%\SetupHost.exe\0" /f /v FilterFullPath /d "%%SystemDrive%%\$WINDOWS.~BT\Sources\SetupHost.exe" ^>nul
+ECHO reg add "%%IFEO%%\SetupHost.exe\0" /f /v Debugger /d "%%ProgramData%%\AllowUpgrades\AllowUpgrades.cmd" ^>nul
+ECHO echo;
+ECHO %%^<%%:f0 " AllowUnsupportedUpgrades "%%^>^>%% ^& %%^<%%:2f " ENABLED "%%^>^>%% ^& %%^<%%:f0 " Run again to DISABLE "%%^>%%
+ECHO if /i "%%CLI%%"=="" ECHO. ^& PAUSE
+ECHO exit /b
+ECHO :remove
+ECHO del /f /q "%%ProgramData%%\AllowUpgrades\AllowUpgrades.cmd"^>nul 2^>nul ^& rd /s /q "%%ProgramData%%\AllowUpgrades"^>nul 2^>nul
+ECHO reg delete "%%IFEO%%\SetupHost.exe" /f ^>nul 2^>nul
+ECHO echo;
+ECHO %%^<%%:f0 " AllowUnsupportedUpgrades "%%^>^>%% ^& %%^<%%:df " DISABLED "%%^>^>%% ^& %%^<%%:f0 " Run again to ENABLE "%%^>%%
+ECHO if /i "%%CLI%%"=="" ECHO. ^& PAUSE
+ECHO EXIT /b
+ECHO '@^); $0 = "$env:temp\AllowUnsupportedUpgrades.cmd"; ${^(=^)^|^|} -split "\r?\n" ^| out-file $0 -encoding default -force; ^& $0
+ECHO # press enter
+)>"%rootfolder%\AllowUnsupportedUpgrades.cmd"
 EXIT /b
