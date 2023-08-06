@@ -46,3 +46,5 @@ function from Git and appends the function with the appropriate commands to re-a
 allow upgrades on unsupported machines via mounted ISO. If the script completes it cleans up after itself, leaving only the download link to be used if it is run 
 again within 24hrs. And of course the ISO! ;) If it does not complete, the partial downloaded files and links will remain in ProgramData and be referenced the next
 time the script is run.
+
+Windows 7 not supported due to powershell limitations, a requirement for MS link generation. Win 8+ supported.
