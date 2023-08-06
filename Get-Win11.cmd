@@ -9,6 +9,9 @@ TITLE Windows 1%VERSION% - Download and System Prep Tool
 >nul 2>&1 REG ADD HKCU\Software\Classes\.GetWin\shell\runas\command /f /ve /d "CMD /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
 >nul 2>&1 FLTMC||(CD.>"%temp%\elevate.GetWin" & START "%~n0" /high "%temp%\elevate.GetWin" "%~f0" "%_:"=""%" & EXIT /b)
 >nul 2>&1 REG DELETE HKCU\Software\Classes\.GetWin\ /f &>nul 2>&1 DEL %temp%\elevate.GetWin /f
+ECHO Checking System...
+FOR /F "usebackq skip=2 tokens=3-4" %%i IN (`REG QUERY "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName 2^>nul`) DO set "ProductName=%%i %%j"
+IF "%ProductName%"=="Windows 7" ECHO. & ECHO WINDOWS 7 DETECTED. & ECHO. & ECHO THIS SCRIPT CANNOT RUN ON WINDOWS 7 DUE TO POWERSHELL LIMITATIONS, UPGRADE TO WIN 8/10 FIRST. & ECHO. & PAUSE & EXIT
 ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0WimFix.log" & ECHO.>>"%~dp0WimFix.log"
 SET ISO=%1
 SET currentindex=1
