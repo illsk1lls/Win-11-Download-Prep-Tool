@@ -14,6 +14,7 @@ Additional Changes to Win 11 ISO:<br>
 <br>
 Allows in place upgrade on live unsupported system (From mounted ISO)<br>
 Enable Legacy F8 Boot Menu<br>
+Enable RegBack Registry backups during reboots<br>
 Disable UAC<br>
 Classic Context Menus<br>
 Decrease Space Between Items (Compact View)<br>
