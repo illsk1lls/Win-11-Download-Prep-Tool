@@ -69,6 +69,7 @@ REG delete "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a
 REG add "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /ve /t REG_SZ /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_software\Policies\Microsoft\Windows\Windows Search" /v EnableDynamicContentInWSB /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\ControlSet001\Control\CI\Policy" /v SkuPolicyRequired /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_system\ControlSet001\Control\Session Manager\Configuration Manager" /v EnablePeriodicBackup /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
