@@ -72,8 +72,11 @@ REG add "HKLM\tmp_system\ControlSet001\Control\CI\Policy" /v SkuPolicyRequired /
 REG add "HKLM\tmp_system\ControlSet001\Control\Session Manager\Configuration Manager" /v EnablePeriodicBackup /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
-REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassSecureBoot /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_system\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v UseCompactMode /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Hidden /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
@@ -192,6 +195,7 @@ ECHO if not defined CLI ^(exit /b^) else if not exist %%SOURCES%%\SetupHost.exe 
 ECHO if not exist %%SOURCES%%\WindowsUpdateBox.exe mklink /h %%SOURCES%%\WindowsUpdateBox.exe %%SOURCES%%\SetupHost.exe
 ECHO reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /f /v DisableWUfBSafeguards /d 1 /t reg_dword
 ECHO reg add HKLM\SYSTEM\Setup\MoSetup /f /v AllowUpgradesWithUnsupportedTPMorCPU /d 1 /t reg_dword
+ECHO reg add HKCU\SOFTWARE\Microsoft\PCHC /f /v UpgradeEligibility /d 1 /t reg_dword
 ECHO set OPT=/Compat IgnoreWarning /MigrateDrivers All /Telemetry Disable
 ECHO set /a restart_application=0x800705BB ^& ^(call set CLI=%%%%CLI:%%1 =%%%%^)
 ECHO set /a incorrect_parameter=0x80070057 ^& ^(set SRV=%%CLI:/Product Client =%%^)
