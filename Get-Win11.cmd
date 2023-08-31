@@ -62,6 +62,7 @@ REG load HKLM\tmp_system "%folder%\%currentindex%\system">>"%~dp0WimFix.log"
 REG load HKLM\tmp_default "%folder%\%currentindex%\ntuser.dat">>"%~dp0WimFix.log"
 REG add "HKLM\tmp_software\Microsoft\Windows\CurrentVersion\OOBE" /v BypassNRO /t REG_DWORD /d 1 /f>>"%~dp0WimFix.log"
 REG add "HKLM\tmp_software\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f>>"%~dp0WimFix.log"
+REG add "HKLM\tmp_software\Policies\Microsoft\Edge" /v WebWidgetAllowed /t REG_DWORD /d 0 /f>nul
 REG add "HKLM\tmp_software\Microsoft\Windows\CurrentVersion\RunOnce" /v EnableF8Menu /t REG_SZ /d "bcdedit /set {default} bootmenupolicy legacy" /f>>"%~dp0WimFix.log"
 "%TempDL%\SetACL.exe" -on "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -ot reg -actn setowner -ownr "n:Administrators" -rec Yes>>"%~dp0WimFix.log"
 "%TempDL%\SetACL.exe" -on "HKLM\tmp_software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -ot reg -actn ace -ace "n:Administrators;p:full" -rec Yes>>"%~dp0WimFix.log"
