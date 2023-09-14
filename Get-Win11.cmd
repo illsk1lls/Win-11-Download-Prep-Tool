@@ -28,7 +28,7 @@ POPD & POPD
 )
 CALL :XBUTTON false
 TITLE Mounting/Extracting ISO
-POWERSHELL -nop -ep bypass -c "Mount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
+POWERSHELL -nop -c "Mount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
 FOR /f "tokens=3 delims=\:" %%d IN ('reg query hklm\system\mounteddevices ^| findstr /c:"5C003F00" ^| findstr /v "{.*}"') do (  
 IF EXIST "%%d:\sources\install.wim" SET SOURCE=%%d
 )
@@ -37,7 +37,7 @@ IF EXIST "%rootfolder%" RD "%rootfolder%" /s /q>>"%~dp0WimFix.log"
 MD "%rootfolder%">>"%~dp0WimFix.log"
 CLS & ECHO. & ECHO Getting Ready, please wait...& ECHO. & ECHO Extracting ISO...
 XCOPY "%SOURCE%:\" "%rootfolder%\" /E /H /C /I /Y>>"%~dp0WimFix.log"
-POWERSHELL -nop -ep bypass -c "Dismount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
+POWERSHELL -nop -c "Dismount-DiskImage ""!ISO!""">>"%~dp0WimFix.log"
 PUSHD "%folder%"
 FOR /F "usebackq tokens=3" %%i IN (`dism /get-wiminfo /wimfile:"%folder%\install.wim"`) DO (
 SET index=%%i
@@ -133,7 +133,7 @@ TITLE Rebuilding ISO
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/wikijm/PowerShell-AdminScripts/master/Miscellaneous/New-IsoFile.ps1 -o '%ProgramData%\MakeIso.ps1'"
 ECHO $source_dir = "%rootfolder%">>"%ProgramData%\MakeIso.ps1"
 ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path "%~dp0Win1%VERSION%_Eng_x64.iso" -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win1%VERSION%-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
-POWERSHELL -nop -ep bypass -c "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
+POWERSHELL -nop -c "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
 POWERSHELL -nop -ep bypass -f "%ProgramData%\MakeIso.ps1">nul
 EXIT /b
 :DOWNLOADTOOLS
@@ -146,7 +146,7 @@ IF EXIST "%TempDL%\Junkbin" RD "%TempDL%\Junkbin" /S /Q>nul
 MD "%TempDL%\Junkbin">nul
 ECHO. & ECHO Getting Tools...
 PUSHD "%TempDL%" & PUSHD "%TempDL%\Junkbin"
-POWERSHELL -nop -ep bypass -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7zr.exe'"; "Invoke-WebRequest -Uri https://www.7-zip.org/a/7z2300-extra.7z -o '7zExtra.7z'"; "Invoke-WebRequest -Uri https://wimlib.net/downloads/wimlib-1.14.1-windows-x86_64-bin.zip -o 'wimlib.zip'"; "Invoke-WebRequest -Uri https://helgeklein.com/downloads/SetACL/current/SetACL%%203.1.2%%20`(executable%%20version`).zip -o 'SetACL.zip'"
+POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7zr.exe'"; "Invoke-WebRequest -Uri https://www.7-zip.org/a/7z2300-extra.7z -o '7zExtra.7z'"; "Invoke-WebRequest -Uri https://wimlib.net/downloads/wimlib-1.14.1-windows-x86_64-bin.zip -o 'wimlib.zip'"; "Invoke-WebRequest -Uri https://helgeklein.com/downloads/SetACL/current/SetACL%%203.1.2%%20`(executable%%20version`).zip -o 'SetACL.zip'"
 7zr.exe e -y 7zExtra.7z>nul & 7za.exe e -y wimlib.zip libwim-15.dll -r -o..>nul & 7za.exe e -y wimlib.zip wimlib-imagex.exe -r -o..>nul & 7za.exe e -y SetACL.zip "SetACL (executable version)\64 bit\SetACL.exe" -r -o..>nul
 EXIT /b
 :DOWNLOADISO
@@ -154,7 +154,7 @@ CALL :DOWNLOADTOOLS
 TITLE Getting Windows 1%VERSION%
 CLS
 ECHO. & ECHO Preparing for ISO Download...
-POWERSHELL -nop -ep bypass -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
+POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
 7za.exe e -y Aria2c.zip Aria2c.exe -r -o..>nul & MOVE /Y Fido.ps1 ..>nul && (ECHO Fido.ps1 moved to %TempDL%>>"%~dp0WimFix.log") || (ECHO Error moving Fido.ps1 to %TempDL%>>"%~dp0WimFix.log") & POPD
 IF EXIST download.1%VERSION%.link (
 FORFILES /d -1 /m "download.1%VERSION%.link" >NUL 2>NUL && (
@@ -178,7 +178,7 @@ ECHO. & ECHO Resuming ISO Download...
 ECHO. & ECHO Starting ISO Download...
 )
 "%TempDL%\aria2c.exe" --continue=true --summary-interval=0 --file-allocation=none --auto-file-renaming=false --max-connection-per-server=5 "!link!" -o Win1%VERSION%_Eng_x64.iso
-POWERSHELL -nop -ep bypass -c "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
+POWERSHELL -nop -c "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
 MOVE /Y "Win1%VERSION%_Eng_x64.iso" "%~dp0">nul && (ECHO Download completed and Win1%VERSION%_Eng_x64.iso moved to %~dp0>>"%~dp0WimFix.log") || (ECHO Error moving Win1%VERSION%_Eng_x64.iso to %~dp0>>"%~dp0WimFix.log")
 SET ISO="%~dp0Win1%VERSION%_Eng_x64.iso"
 POPD
