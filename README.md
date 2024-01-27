@@ -1,5 +1,5 @@
 # Win-11-Download-Prep-Tool<br>
-Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements. In addition to turning off S-Mode *SecureBoot may need to be disabled as well for S-Mode*<br>
+Downloads the latest Win 11 x64 ISO direct from MS - Then SysPreps each index, removing: Network requirements during install, TPM requirements, and RAM requirements. *Disabling S-Mode may also require turning off secure boot.*<br>
 <br>
 Credit to:<br>
 P. Batard - <a href="https://github.com/pbatard/Fido">https://github.com/pbatard/Fido</a><br>
@@ -43,8 +43,8 @@ download will pick up where it left off (the script will resume for up to 72hrs 
 it will be removed and a new ISO will be requested.). Once the download is complete the ISO is mounted with powershell, and extracted to its own temp folder in 
 ProgramData, then unmounted. Wimlib-Imagex is then used to extract the registry hives from each index (Edition), make changes, then inject the updated registry 
 hives back into the Windows image, until all indexes are updated. Once the Windows image has been updated the script downloads the "New-IsoFile.ps1" powershell 
-function from Git and appends the function with the appropriate commands to re-author the ISO with the new image. A CMD script is placed at the root of the ISO to
-allow upgrades on unsupported machines via mounted ISO. If the script completes it cleans up after itself, leaving only the download link to be used if it is run 
+function from Git and appends the function with the appropriate commands to re-author the ISO with the new image. 2 CMD scripts are placed at the root of the ISO, one to
+allow upgrades on unsupported machines via mounted ISO, and one to clear out stuck Windows updates. If the script completes it cleans up after itself, leaving only the download link to be used if it is run 
 again within 24hrs. And of course the ISO! ;) If it does not complete, the partial downloaded files and links will remain in ProgramData and be referenced the next
 time the script is run.
 
