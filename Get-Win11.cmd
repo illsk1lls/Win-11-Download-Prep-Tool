@@ -1,11 +1,13 @@
 @ECHO OFF
-SETLOCAL ENABLEDELAYEDEXPANSION
 SET VERSION=%~n0
 SET VERSION=%VERSION:~-1%
 IF NOT 1%VERSION% == 10 (
 SET VERSION=1
 )
-TITLE Windows 1%VERSION% - Download and System Prep Tool
+SET "TitleName=Get-Win1%VERSION%"
+TASKLIST /V /NH /FI "imagename eq cmd.exe"|FINDSTR /I /C:"Get-Win">nul
+IF NOT %errorlevel%==1 POWERSHELL -nop -c "$^={$Notify=[PowerShell]::Create().AddScript({$Audio=New-Object System.Media.SoundPlayer;$Audio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav';$Audio.playsync()});$rs=[RunspaceFactory]::CreateRunspace();$rs.ApartmentState="^""STA"^"";$rs.ThreadOptions="^""ReuseThread"^"";$rs.Open();$Notify.Runspace=$rs;$Notify.BeginInvoke()};&$^;$PopUp=New-Object -ComObject Wscript.Shell;$PopUp.Popup("^""The script is already running!"^"",0,'ERROR:',0x10)">nul&EXIT
+TITLE %TitleName%
 >nul 2>&1 REG ADD HKCU\Software\Classes\.GetWin\shell\runas\command /f /ve /d "CMD /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
 >nul 2>&1 FLTMC||(CD.>"%temp%\elevate.GetWin" & START "%~n0" /high "%temp%\elevate.GetWin" "%~f0" "%_:"=""%" & EXIT /b)
 >nul 2>&1 REG DELETE HKCU\Software\Classes\.GetWin\ /f &>nul 2>&1 DEL %temp%\elevate.GetWin /f
@@ -13,6 +15,7 @@ ECHO Checking System...
 FOR /F "usebackq skip=2 tokens=3-4" %%i IN (`REG QUERY "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName 2^>nul`) DO set "ProductName=%%i %%j"
 IF "%ProductName%"=="Windows 7" ECHO/ & ECHO WINDOWS 7 DETECTED. & ECHO/ & ECHO THIS SCRIPT CANNOT RUN ON WINDOWS 7 DUE TO POWERSHELL LIMITATIONS, UPGRADE TO WIN 8/10 FIRST. & ECHO/ & PAUSE & EXIT
 ECHO Started processing ISO/WIM on %date% at %time%>"%~dp0Get-Win1%VERSION%.log" & ECHO/>>"%~dp0Get-Win1%VERSION%.log"
+SETLOCAL ENABLEDELAYEDEXPANSION
 SET "ISO=%1"
 SET /a currentindex=1
 SET "rootfolder=%ProgramData%\TempSysPrep"
@@ -27,7 +30,7 @@ CALL :DOWNLOADTOOLS
 POPD & POPD
 )
 CALL :XBUTTON false
-TITLE Mounting/Extracting ISO
+TITLE %TitleName% - Mounting/Extracting ISO
 POWERSHELL -nop -c "Mount-DiskImage '!ISO!'">>"%~dp0Get-Win1%VERSION%.log"
 FOR /f "tokens=3 delims=\:" %%d IN ('reg query hklm\system\mounteddevices ^| findstr /c:"5C003F00" ^| findstr /v "{.*}"') do (  
 IF EXIST "%%d:\sources\install.wim" SET SOURCE=%%d
@@ -48,7 +51,7 @@ SET "REVERSEPATH=%folder:\=/%"
 :APPLY
 CLS
 IF %currentindex% leq %totalindex% (
-TITLE Applying Settings to WIM ^(Index %currentindex% of %totalindex%^)
+TITLE %TitleName% - Applying Settings to WIM ^(Index %currentindex% of %totalindex%^)
 ECHO/ & ECHO Working on Index %currentindex%...
 ECHO/
 "%TempDL%\wimlib-imagex.exe" extract install.wim %currentindex% /Windows/System32/config/software --dest-dir="%reversepath%/%currentindex%"
@@ -99,7 +102,7 @@ GOTO FINALIZE
 SET /a currentindex+=1
 GOTO APPLY
 :FINALIZE
-TITLE Please Wait...
+TITLE %TitleName% - Please Wait...
 POPD
 ECHO/ & ECHO Adding TPM skip and Update refresh...
 CALL :ADDUNSUPPORTEDCMD
@@ -117,7 +120,7 @@ MOVE /Y "%ProgramData%\download.1%VERSION%.link" "%TempDL%">nul && (ECHO downloa
 RD "%TempDL%" /S /Q>>"%~dp0Get-Win1%VERSION%.log"
 )
 ECHO/>>"%~dp0Get-Win1%VERSION%.log" & ECHO Completed processing ISO/WIM on %date% at %time%>>"%~dp0Get-Win1%VERSION%.log"
-TITLE Process Complete.
+TITLE %TitleName% - Process Complete.
 ECHO/ & ECHO Process Complete.. & ECHO/ & ECHO ISO Updated & ECHO/ & ECHO "Win1!VERSION!_Eng_x64.iso" is located in the same folder as this script. ;^) & ECHO/
 CALL :XBUTTON true
 PAUSE
@@ -130,7 +133,7 @@ EXIT /b
 >nul 2>&1 POWERSHELL -nop -c "$w=Add-Type -Name WAPI -PassThru -MemberDefinition '[DllImport(\"user32.dll\")]public static extern void SetProcessDPIAware();[DllImport(\"shcore.dll\")]public static extern void SetProcessDpiAwareness(int value);[DllImport(\"kernel32.dll\")]public static extern IntPtr GetConsoleWindow();[DllImport(\"user32.dll\")]public static extern void GetWindowRect(IntPtr hwnd, int[] rect);[DllImport(\"user32.dll\")]public static extern void GetClientRect(IntPtr hwnd, int[] rect);[DllImport(\"user32.dll\")]public static extern void GetMonitorInfoW(IntPtr hMonitor, int[] lpmi);[DllImport(\"user32.dll\")]public static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);[DllImport(\"user32.dll\")]public static extern int SetWindowPos(IntPtr hwnd, IntPtr hwndAfterZ, int x, int y, int w, int h, int flags);';$PROCESS_PER_MONITOR_DPI_AWARE=2;try {$w::SetProcessDpiAwareness($PROCESS_PER_MONITOR_DPI_AWARE)} catch {$w::SetProcessDPIAware()}$hwnd=$w::GetConsoleWindow();$moninf=[int[]]::new(10);$moninf[0]=40;$MONITOR_DEFAULTTONEAREST=2;$w::GetMonitorInfoW($w::MonitorFromWindow($hwnd, $MONITOR_DEFAULTTONEAREST), $moninf);$monwidth=$moninf[7] - $moninf[5];$monheight=$moninf[8] - $moninf[6];$wrect=[int[]]::new(4);$w::GetWindowRect($hwnd, $wrect);$winwidth=$wrect[2] - $wrect[0];$winheight=$wrect[3] - $wrect[1];$x=[int][math]::Round($moninf[5] + $monwidth / 2 - $winwidth / 2);$y=[int][math]::Round($moninf[6] + $monheight / 2 - $winheight / 2);$SWP_NOSIZE=0x0001;$SWP_NOZORDER=0x0004;exit [int]($w::SetWindowPos($hwnd, [IntPtr]::Zero, $x, $y, 0, 0, $SWP_NOSIZE -bOr $SWP_NOZORDER) -eq 0)"
 EXIT /b
 :MAKEISO
-TITLE Rebuilding ISO
+TITLE %TitleName% - Rebuilding ISO
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/wikijm/PowerShell-AdminScripts/master/Miscellaneous/New-IsoFile.ps1 -o '%ProgramData%\MakeIso.ps1'"
 ECHO $source_dir = "%rootfolder%">>"%ProgramData%\MakeIso.ps1"
 ECHO get-childitem "$source_dir" ^| New-ISOFile -force -path "%~dp0Win1%VERSION%_Eng_x64.iso" -BootFile %rootfolder%\efi\microsoft\boot\efisys.bin -Title "Win1%VERSION%-ReadyToInstall">>"%ProgramData%\MakeIso.ps1"
@@ -138,7 +141,7 @@ POWERSHELL -nop -c "Dismount-DiskImage ""%~dp0Win1%VERSION%_Eng_x64.iso""">nul
 POWERSHELL -nop -ep bypass -f "%ProgramData%\MakeIso.ps1">nul
 EXIT /b
 :DOWNLOADTOOLS
-TITLE Downloading Tools
+TITLE %TitleName% - Downloading Tools
 CLS
 PING -n 1 "google.com" | findstr /r /c:"[0-9] *ms">nul
 IF NOT %errorlevel% == 0 ECHO/ & ECHO Internet connection not detected! & ECHO/ & RD "%rootfolder%" /S /Q>nul & PAUSE & EXIT
@@ -152,7 +155,7 @@ POWERSHELL -nop -c "Invoke-WebRequest -Uri https://www.7-zip.org/a/7zr.exe -o '7
 EXIT /b
 :DOWNLOADISO
 CALL :DOWNLOADTOOLS
-TITLE Getting Windows 1%VERSION%
+TITLE %TitleName% - Downloading ISO
 CLS
 ECHO/ & ECHO Preparing for ISO Download...
 POWERSHELL -nop -c "Invoke-WebRequest -Uri https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip -o 'Aria2c.zip'"; "Invoke-WebRequest -Uri https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -o 'Fido.ps1'"
