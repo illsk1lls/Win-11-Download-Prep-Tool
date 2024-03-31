@@ -48,4 +48,4 @@ allow upgrades on unsupported machines via mounted ISO, and one to clear out stu
 again within 24hrs. And of course the ISO! ;) If it does not complete, the partial downloaded files and links will remain in ProgramData and be referenced the next
 time the script is run.
 
-Windows 7 not supported due to powershell limitations, a requirement for MS link generation. Win 8+ supported.
+Windows 7 not supported due to powershell limitations, a requirement for MS link generation. Win 8+ with latest .NET updates supported.
