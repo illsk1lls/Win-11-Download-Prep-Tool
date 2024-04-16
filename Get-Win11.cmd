@@ -9,7 +9,7 @@ TASKLIST /V /NH /FI "imagename eq cmd.exe"|FINDSTR /I /C:"Get-Win">nul
 IF NOT %errorlevel%==1 POWERSHELL -nop -c "$^={$Notify=[PowerShell]::Create().AddScript({$Audio=New-Object System.Media.SoundPlayer;$Audio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav';$Audio.playsync()});$rs=[RunspaceFactory]::CreateRunspace();$rs.ApartmentState="^""STA"^"";$rs.ThreadOptions="^""ReuseThread"^"";$rs.Open();$Notify.Runspace=$rs;$Notify.BeginInvoke()};&$^;$PopUp=New-Object -ComObject Wscript.Shell;$PopUp.Popup("^""The script is already running!"^"",0,'ERROR:',0x10)">nul&EXIT
 TITLE %TitleName%
 >nul 2>&1 REG ADD HKCU\Software\Classes\.GetWin\shell\runas\command /f /ve /d "CMD /x /d /r SET \"f0=%%2\"& call \"%%2\" %%3"& SET _= %*
->nul 2>&1 FLTMC||(CD.>"%temp%\elevate.GetWin" & START "%~n0" /high "%temp%\elevate.GetWin" "%~f0" "%_:"=""%" & EXIT /b)
+>nul 2>&1 FLTMC||(CD.>"%temp%\elevate.GetWin" & START "Relaunching..." /high "%temp%\elevate.GetWin" "%~f0" "%_:"=""%" & EXIT /b)
 >nul 2>&1 REG DELETE HKCU\Software\Classes\.GetWin\ /f &>nul 2>&1 DEL %temp%\elevate.GetWin /f
 ECHO Checking System...
 FOR /F "usebackq skip=2 tokens=3-4" %%i IN (`REG QUERY "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName 2^>nul`) DO set "ProductName=%%i %%j"
